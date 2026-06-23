@@ -1,72 +1,112 @@
--- ============================================================
---  Base de données : gestion_taches
--- ============================================================
+-- MySQL dump 10.13  Distrib 8.4.9, for Linux (x86_64)
+--
+-- Host: localhost    Database: gestion_tache
+-- ------------------------------------------------------
+-- Server version	8.4.9-0ubuntu0.26.04.1
 
-CREATE DATABASE IF NOT EXISTS gestion_taches
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-USE gestion_taches;
+--
+-- Table structure for table `categories`
+--
 
--- ------------------------------------------------------------
---  Utilisateurs
--- ------------------------------------------------------------
-CREATE TABLE utilisateurs (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    nom         VARCHAR(100)        NOT NULL,
-    email       VARCHAR(150)        NOT NULL UNIQUE,
-    created_at  TIMESTAMP           DEFAULT CURRENT_TIMESTAMP
-);
+DROP TABLE IF EXISTS `categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- ------------------------------------------------------------
---  Catégories de tâches
--- ------------------------------------------------------------
-CREATE TABLE categories (
-    id          INT AUTO_INCREMENT PRIMARY KEY,
-    nom         VARCHAR(100)        NOT NULL
-);
+--
+-- Dumping data for table `categories`
+--
 
--- ------------------------------------------------------------
---  Tâches
--- ------------------------------------------------------------
-CREATE TABLE taches (
-    id              INT AUTO_INCREMENT PRIMARY KEY,
-    titre           VARCHAR(255)        NOT NULL,
-    description     TEXT,
-    termine         BOOLEAN             DEFAULT FALSE,
-    priorite        ENUM('basse','moyenne','haute') DEFAULT 'moyenne',
-    utilisateur_id  INT,
-    categorie_id    INT,
-    created_at      TIMESTAMP           DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+LOCK TABLES `categories` WRITE;
+/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+INSERT INTO `categories` VALUES (1,'École'),(2,'Personnel'),(3,'Travail');
+/*!40000 ALTER TABLE `categories` ENABLE KEYS */;
+UNLOCK TABLES;
 
-    FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE SET NULL,
-    FOREIGN KEY (categorie_id)   REFERENCES categories(id)   ON DELETE SET NULL
-);
+--
+-- Table structure for table `taches`
+--
 
--- ============================================================
---  Données de test
--- ============================================================
+DROP TABLE IF EXISTS `taches`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `taches` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `titre` varchar(255) NOT NULL,
+  `description` text,
+  `termine` tinyint(1) DEFAULT '0',
+  `priorite` enum('basse','moyenne','haute') DEFAULT 'moyenne',
+  `utilisateur_id` int DEFAULT NULL,
+  `categorie_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `utilisateur_id` (`utilisateur_id`),
+  KEY `categorie_id` (`categorie_id`),
+  CONSTRAINT `taches_ibfk_1` FOREIGN KEY (`utilisateur_id`) REFERENCES `utilisateurs` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `taches_ibfk_2` FOREIGN KEY (`categorie_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO utilisateurs (nom, email) VALUES
-    ('Justin Lachapelle',   'justin@example.com'),
-    ('Sophie Tremblay','sophie@example.com');
+--
+-- Dumping data for table `taches`
+--
 
-INSERT INTO categories (nom) VALUES
-    ('École'),
-    ('Personnel'),
-    ('Travail');
+LOCK TABLES `taches` WRITE;
+/*!40000 ALTER TABLE `taches` DISABLE KEYS */;
+/*!40000 ALTER TABLE `taches` ENABLE KEYS */;
+UNLOCK TABLES;
 
-INSERT INTO taches (titre, description, termine, priorite, utilisateur_id, categorie_id) VALUES
-    ('Remettre le devoir PHP',  'Faire fonctionner l\'app dans WSL avec NGINX', FALSE, 'haute',   1, 1),
-    ('Réviser pour l\'exam SQL','Revoir les JOIN et les clés étrangères',        FALSE, 'haute',   1, 1),
-    ('Acheter épicerie',        NULL,                                             FALSE, 'basse',   1, 2),
-    ('Lire chapitre 4',         'Manuel de bases de données',                    TRUE,  'moyenne', 2, 1);
+--
+-- Table structure for table `utilisateurs`
+--
 
--- ============================================================
---  Utilisateur MySQL pour l'app
--- ============================================================
+DROP TABLE IF EXISTS `utilisateurs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `utilisateurs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(100) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-CREATE USER IF NOT EXISTS 'app_user'@'localhost' IDENTIFIED BY 'motdepasse123';
-GRANT ALL PRIVILEGES ON gestion_taches.* TO 'app_user'@'localhost';
-FLUSH PRIVILEGES;
+--
+-- Dumping data for table `utilisateurs`
+--
+
+LOCK TABLES `utilisateurs` WRITE;
+/*!40000 ALTER TABLE `utilisateurs` DISABLE KEYS */;
+INSERT INTO `utilisateurs` VALUES (1,'Jacob Martin','jacob@example.com','2026-06-12 02:29:03');
+/*!40000 ALTER TABLE `utilisateurs` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-06-23 14:10:18
